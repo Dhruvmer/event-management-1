@@ -19,6 +19,7 @@ const path = require('path');
 const methodOverride = require('method-override');
 const expressLayouts = require('express-ejs-layouts');
 const rateLimit = require('express-rate-limit');
+const fs = require('fs');
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
@@ -27,6 +28,7 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const apiRoutes = require('./routes/apiRoutes');
+const imageRoutes = require('./routes/imageRoutes');
 
 // Import Middleware
 const { errorHandler, notFound } = require('./middleware/errorHandler');
@@ -105,6 +107,10 @@ app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: process.env.NODE_ENV === 'production' ? '30d' : '0',
   etag: true
 }));
+
+// Image Handler Middleware for missing images
+const handleMissingImages = require('./middleware/imageHandler');
+app.use(handleMissingImages);
 
 // ============================================
 // VIEW ENGINE SETUP
@@ -188,6 +194,9 @@ app.use('/bookings', bookingRoutes);
 app.use('/admin', adminRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/api', apiRoutes);
+app.use('/uploads/profiles', imageRoutes);
+app.use('/uploads/events', imageRoutes);
+app.use('/uploads/gallery', imageRoutes);
 
 // Home Route
 app.get('/', (req, res) => {
@@ -212,6 +221,43 @@ app.get('/home', (req, res) => {
     featuredEvents: [],
     recentGallery: [],
     testimonials: []
+  });
+});
+
+// ============================================
+// MISSING IMAGE HANDLER
+// ============================================
+app.use('/uploads/profiles/:filename', (req, res, next) => {
+  const filePath = path.join(__dirname, 'public/uploads/profiles', req.params.filename);
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      // File doesn't exist, serve default avatar
+      const defaultPath = path.join(__dirname, 'public/images/default-avatar.png');
+      return res.sendFile(defaultPath);
+    }
+    next();
+  });
+});
+
+app.use('/uploads/events/:filename', (req, res, next) => {
+  const filePath = path.join(__dirname, 'public/uploads/events', req.params.filename);
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      const defaultPath = path.join(__dirname, 'public/images/default-event.jpg');
+      return res.sendFile(defaultPath);
+    }
+    next();
+  });
+});
+
+app.use('/uploads/gallery/:filename', (req, res, next) => {
+  const filePath = path.join(__dirname, 'public/uploads/gallery', req.params.filename);
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      const defaultPath = path.join(__dirname, 'public/images/default-event.jpg');
+      return res.sendFile(defaultPath);
+    }
+    next();
   });
 });
 
