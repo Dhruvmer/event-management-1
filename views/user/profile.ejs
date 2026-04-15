@@ -1,0 +1,94 @@
+<section style="margin-top:80px;min-height:100vh;" class="bg-light py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Profile Card -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 text-center p-4">
+          <img src="<%= user.profileImage %>" alt="Profile" class="rounded-circle mx-auto mb-3" 
+               style="width:120px;height:120px;object-fit:cover;border:4px solid #6C63FF;"
+               onerror="this.src='/images/default-avatar.png'">
+          <h4 class="fw-bold"><%= user.fullName %></h4>
+          <p class="text-muted"><%= user.email %></p>
+          <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+            <i class="fas fa-user me-1"></i><%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %>
+          </span>
+          <hr>
+          <div class="text-start">
+            <p class="small"><i class="fas fa-phone text-primary me-2"></i><%= user.phone %></p>
+            <p class="small"><i class="fas fa-map-marker-alt text-primary me-2"></i>
+              <%= user.address?.city || '' %><%= user.address?.state ? ', ' + user.address.state : '' %>
+            </p>
+            <p class="small"><i class="fas fa-calendar text-primary me-2"></i>Joined: <%= new Date(user.createdAt).toLocaleDateString('en-IN') %></p>
+            <p class="small"><i class="fas fa-sign-in-alt text-primary me-2"></i>Last Login: <%= user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-IN') : 'N/A' %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Profile -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-edit text-primary me-2"></i>Edit Profile</h5>
+          <form action="/auth/profile/update" method="POST" enctype="multipart/form-data">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">First Name</label>
+                <input type="text" name="firstName" class="form-control" value="<%= user.firstName %>" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="lastName" class="form-control" value="<%= user.lastName %>" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Phone</label>
+                <input type="tel" name="phone" class="form-control" value="<%= user.phone %>" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Profile Image</label>
+                <input type="file" name="profileImage" class="form-control" accept="image/*">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">City</label>
+                <input type="text" name="city" class="form-control" value="<%= user.address?.city || '' %>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">State</label>
+                <input type="text" name="state" class="form-control" value="<%= user.address?.state || '' %>">
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary rounded-pill px-4" onclick="return confirm('Are you sure you want to update your profile?')">
+                  <i class="fas fa-save me-2"></i>Update Profile
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Change Password -->
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-lock text-primary me-2"></i>Change Password</h5>
+          <form action="/auth/profile/change-password" method="POST">
+            <div class="row g-3">
+              <div class="col-md-12">
+                <label class="form-label">Current Password</label>
+                <input type="password" name="currentPassword" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">New Password</label>
+                <input type="password" name="newPassword" class="form-control" required minlength="8">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" name="confirmNewPassword" class="form-control" required minlength="8">
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-warning rounded-pill px-4" onclick="return confirm('Are you sure you want to change your password?')">
+                  <i class="fas fa-key me-2"></i>Change Password
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

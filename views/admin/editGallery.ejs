@@ -1,0 +1,116 @@
+<div class="admin-topbar">
+  <h4 class="fw-bold mb-0"><i class="fas fa-images me-2"></i>Edit Gallery</h4>
+  <a href="/admin/gallery" class="btn btn-outline-secondary rounded-pill">
+    <i class="fas fa-arrow-left me-2"></i>Back to Gallery
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-4">
+    <form action="/admin/gallery/edit/<%= gallery._id %>" method="POST" enctype="multipart/form-data" novalidate>
+      <div class="row g-3">
+        <!-- Basic Information -->
+        <div class="col-12">
+          <h5 class="fw-bold mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Basic Information</h5>
+        </div>
+        
+        <div class="col-md-8">
+          <label class="form-label fw-500">Gallery Title *</label>
+          <input type="text" name="title" class="form-control" value="<%= gallery.title %>" required>
+        </div>
+        
+        <div class="col-md-4">
+          <label class="form-label fw-500">Category *</label>
+          <select name="category" class="form-select" required>
+            <option value="">Select Category</option>
+            <option value="wedding" <%= gallery.category === 'wedding' ? 'selected' : '' %>>Wedding</option>
+            <option value="corporate" <%= gallery.category === 'corporate' ? 'selected' : '' %>>Corporate</option>
+            <option value="birthday" <%= gallery.category === 'birthday' ? 'selected' : '' %>>Birthday</option>
+            <option value="conference" <%= gallery.category === 'conference' ? 'selected' : '' %>>Conference</option>
+            <option value="exhibition" <%= gallery.category === 'exhibition' ? 'selected' : '' %>>Exhibition</option>
+            <option value="concert" <%= gallery.category === 'concert' ? 'selected' : '' %>>Concert</option>
+            <option value="other" <%= gallery.category === 'other' ? 'selected' : '' %>>Other</option>
+          </select>
+        </div>
+        
+        <div class="col-12">
+          <label class="form-label fw-500">Description</label>
+          <textarea name="description" class="form-control" rows="4" placeholder="Describe this gallery..."><%= gallery.description || '' %></textarea>
+        </div>
+        
+        <!-- Event Details -->
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-calendar text-primary me-2"></i>Event Details</h5>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Venue</label>
+          <input type="text" name="venue" class="form-control" value="<%= gallery.venue || '' %>" placeholder="Event venue">
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Event Date</label>
+          <input type="date" name="eventDate" class="form-control" value="<%= gallery.eventDate ? new Date(gallery.eventDate).toISOString().split('T')[0] : '' %>">
+        </div>
+        
+        <!-- Current Images -->
+        <% if (gallery.images && gallery.images.length > 0) { %>
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-images text-primary me-2"></i>Current Images (<%= gallery.images.length %>)</h5>
+          <div class="row g-2">
+            <% gallery.images.forEach((image, index) => { %>
+              <div class="col-md-2 col-sm-3 col-4">
+                <div class="position-relative">
+                  <img src="<%= image.url %>" alt="Gallery Image <%= index + 1 %>" 
+                       class="w-100 rounded" style="height:80px;object-fit:cover;"
+                       onerror="this.src='/images/default-event.jpg'">
+                  <span class="position-absolute top-0 end-0 m-1 badge bg-dark bg-opacity-75">
+                    <%= index + 1 %>
+                  </span>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+        
+        <!-- Add New Images -->
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-plus-circle text-primary me-2"></i>Add More Images</h5>
+        </div>
+        
+        <div class="col-12">
+          <label class="form-label fw-500">Upload Additional Images</label>
+          <input type="file" name="galleryImages" class="form-control" multiple accept="image/*">
+          <small class="text-muted">Select additional images to add to this gallery (JPG, PNG, WebP). Maximum 20 images total.</small>
+        </div>
+        
+        <!-- Options -->
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-cog text-primary me-2"></i>Options</h5>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="isFeatured" value="true" id="isFeatured" <%= gallery.isFeatured ? 'checked' : '' %>>
+            <label class="form-check-label" for="isFeatured">
+              Mark as Featured Gallery
+            </label>
+          </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="col-12 mt-4">
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill" onclick="return confirm('Update this gallery?')">
+              <i class="fas fa-save me-2"></i>Update Gallery
+            </button>
+            <a href="/admin/gallery" class="btn btn-outline-secondary btn-lg rounded-pill">
+              <i class="fas fa-times me-2"></i>Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

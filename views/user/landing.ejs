@@ -1,0 +1,269 @@
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-overlay"></div>
+  <div class="hero-particles" id="particles"></div>
+  <div class="container position-relative">
+    <div class="row min-vh-100 align-items-center">
+      <div class="col-lg-7 text-white">
+        <span class="badge bg-primary bg-opacity-25 text-white px-3 py-2 mb-3 animate__animated animate__fadeInDown">
+          ✨ #1 Event Management Platform
+        </span>
+        <h1 class="display-3 fw-bold mb-4 animate__animated animate__fadeInUp">
+          Make Every<br>
+          <span class="gradient-text">Moment</span> Memorable
+        </h1>
+        <p class="lead mb-4 opacity-75 animate__animated animate__fadeInUp animate__delay-1s">
+          From dream weddings to grand corporate events, we craft unforgettable experiences tailored to your vision. Let us handle the details while you enjoy the moment.
+        </p>
+        <div class="d-flex gap-3 animate__animated animate__fadeInUp animate__delay-2s">
+          <a href="/events" class="btn btn-primary btn-lg px-4 rounded-pill shadow-lg">
+            <i class="fas fa-calendar-alt me-2"></i>Explore Events
+          </a>
+          <a href="/events/gallery" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+            <i class="fas fa-images me-2"></i>View Gallery
+          </a>
+        </div>
+        <!-- Stats -->
+        <div class="row mt-5 animate__animated animate__fadeInUp animate__delay-2s">
+          <div class="col-4">
+            <h3 class="fw-bold mb-0 counter" data-target="<%= totalEvents %>"><%= totalEvents %>+</h3>
+            <small class="opacity-75">Event Types</small>
+          </div>
+          <div class="col-4">
+            <h3 class="fw-bold mb-0 counter" data-target="<%= completedBookings %>"><%= completedBookings %>+</h3>
+            <small class="opacity-75">Events Completed</small>
+          </div>
+          <div class="col-4">
+            <h3 class="fw-bold mb-0">98%</h3>
+            <small class="opacity-75">Happy Clients</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block animate__animated animate__fadeInRight animate__delay-1s">
+        <div class="hero-image-wrapper">
+          <div class="floating-card card-1">
+            <i class="fas fa-heart text-danger"></i>
+            <span>500+ Weddings</span>
+          </div>
+          <div class="floating-card card-2">
+            <i class="fas fa-star text-warning"></i>
+            <span>4.9 Rating</span>
+          </div>
+          <div class="floating-card card-3">
+            <i class="fas fa-check-circle text-success"></i>
+            <span>100% Satisfaction</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Event Categories Section -->
+<section class="py-5 bg-light" id="categories">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3">Our Services</span>
+      <h2 class="display-5 fw-bold">Event <span class="gradient-text">Categories</span></h2>
+      <p class="text-muted mx-auto" style="max-width:600px;">Choose from our wide range of event services, each crafted with precision and creativity.</p>
+    </div>
+    <div class="row g-4">
+      <% const categories = [
+        { icon: 'fas fa-ring', name: 'Wedding', slug: 'wedding', color: '#FF6B6B', desc: 'Dream weddings crafted to perfection' },
+        { icon: 'fas fa-birthday-cake', name: 'Birthday', slug: 'birthday', color: '#4ECDC4', desc: 'Celebrate every year in style' },
+        { icon: 'fas fa-building', name: 'Corporate', slug: 'corporate', color: '#45B7D1', desc: 'Professional corporate events' },
+        { icon: 'fas fa-music', name: 'Concert', slug: 'concert', color: '#96CEB4', desc: 'Musical events & live shows' },
+        { icon: 'fas fa-microphone', name: 'Conference', slug: 'conference', color: '#FFEAA7', desc: 'Seminars & conferences' },
+        { icon: 'fas fa-heart', name: 'Anniversary', slug: 'anniversary', color: '#DDA0DD', desc: 'Celebrate love milestones' },
+        { icon: 'fas fa-baby', name: 'Baby Shower', slug: 'baby-shower', color: '#FFB6C1', desc: 'Welcome the little one' },
+        { icon: 'fas fa-gem', name: 'Engagement', slug: 'engagement', color: '#87CEEB', desc: 'Mark the beginning beautifully' }
+      ]; %>
+      <% categories.forEach(cat => { %>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <a href="/events?category=<%= cat.slug %>" class="text-decoration-none">
+            <div class="category-card text-center p-4">
+              <div class="category-icon mx-auto mb-3" style="background:<%= cat.color %>20;color:<%= cat.color %>">
+                <i class="<%= cat.icon %> fa-2x"></i>
+              </div>
+              <h5 class="fw-bold text-dark"><%= cat.name %></h5>
+              <p class="text-muted small mb-0"><%= cat.desc %></p>
+            </div>
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Events Section -->
+<% if (featuredEvents && featuredEvents.length > 0) { %>
+<section class="py-5" id="featured">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3">Featured</span>
+      <h2 class="display-5 fw-bold">Popular <span class="gradient-text">Events</span></h2>
+      <p class="text-muted">Discover our most booked and highly rated event services</p>
+    </div>
+    <div class="row g-4">
+      <% featuredEvents.forEach(event => { %>
+        <div class="col-lg-4 col-md-6">
+          <div class="event-card card border-0 shadow-sm h-100">
+            <div class="card-img-top-wrapper">
+              <img src="<%= event.eventImage %>" class="card-img-top" alt="<%= event.title %>" 
+                   onerror="this.src='/images/default-event.jpg'" style="height:220px;object-fit:cover;">
+              <div class="event-category-badge">
+                <%= getCategoryName(event.category) %>
+              </div>
+              <% if (event.isFeatured) { %>
+                <div class="featured-badge"><i class="fas fa-star"></i> Featured</div>
+              <% } %>
+            </div>
+            <div class="card-body p-4">
+              <h5 class="card-title fw-bold"><%= event.title %></h5>
+              <p class="card-text text-muted small"><%= event.shortDescription || event.description.substring(0, 120) + '...' %></p>
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                  <span class="text-primary fw-bold fs-5">₹<%= event.pricing.basePrice.toLocaleString('en-IN') %></span>
+                  <small class="text-muted"> onwards</small>
+                </div>
+                <div class="text-warning small">
+                  <% for(let i = 0; i < 5; i++) { %>
+                    <i class="fas fa-star<%= i < Math.round(event.averageRating) ? '' : '-half-alt' %>"></i>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer bg-transparent border-0 p-4 pt-0">
+              <div class="d-flex gap-2">
+                <a href="/events/<%= event.slug %>" class="btn btn-outline-primary btn-sm flex-grow-1 rounded-pill">
+                  <i class="fas fa-eye me-1"></i>View Details
+                </a>
+                <a href="/bookings/book/<%= event.slug %>" class="btn btn-primary btn-sm flex-grow-1 rounded-pill">
+                  <i class="fas fa-ticket-alt me-1"></i>Book Now
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    <div class="text-center mt-5">
+      <a href="/events" class="btn btn-outline-primary btn-lg px-5 rounded-pill">
+        View All Events <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-light">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3">Process</span>
+      <h2 class="display-5 fw-bold">How It <span class="gradient-text">Works</span></h2>
+    </div>
+    <div class="row g-4">
+      <% const steps = [
+        { icon: 'fas fa-search', title: 'Browse Events', desc: 'Explore our wide range of event services and find the perfect match.', num: '01' },
+        { icon: 'fas fa-edit', title: 'Fill Details', desc: 'Provide your event requirements, date, venue, and guest count.', num: '02' },
+        { icon: 'fas fa-credit-card', title: 'Secure Payment', desc: 'Make secure payment through Razorpay with multiple options.', num: '03' },
+        { icon: 'fas fa-check-double', title: 'Get Confirmation', desc: 'Receive instant booking confirmation with PDF on email.', num: '04' }
+      ]; %>
+      <% steps.forEach(step => { %>
+        <div class="col-lg-3 col-md-6">
+          <div class="step-card text-center p-4">
+            <div class="step-number"><%= step.num %></div>
+            <div class="step-icon mx-auto mb-3">
+              <i class="<%= step.icon %> fa-2x text-primary"></i>
+            </div>
+            <h5 class="fw-bold"><%= step.title %></h5>
+            <p class="text-muted small"><%= step.desc %></p>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- Gallery Preview -->
+<% if (recentGallery && recentGallery.length > 0) { %>
+<section class="py-5" id="gallery-preview">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3">Portfolio</span>
+      <h2 class="display-5 fw-bold">Our <span class="gradient-text">Gallery</span></h2>
+      <p class="text-muted">A glimpse of the events we've successfully organized</p>
+    </div>
+    <div class="row g-3">
+      <% recentGallery.forEach((gallery, index) => { %>
+        <div class="col-lg-3 col-md-4 col-6">
+          <div class="gallery-item">
+            <img src="<%= gallery.images[0]?.url || '/images/default-event.jpg' %>" alt="<%= gallery.title %>" 
+                 onerror="this.src='/images/default-event.jpg'" class="img-fluid rounded-3">
+            <div class="gallery-overlay">
+              <h6 class="text-white mb-1"><%= gallery.title %></h6>
+              <small class="text-white-50"><%= getCategoryName(gallery.category) %></small>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    <div class="text-center mt-4">
+      <a href="/events/gallery" class="btn btn-outline-primary rounded-pill px-4">
+        View Full Gallery <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- Testimonials -->
+<section class="py-5 bg-dark text-white">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="badge bg-primary bg-opacity-25 text-white px-3 py-2 mb-3">Testimonials</span>
+      <h2 class="display-5 fw-bold">What Our <span class="gradient-text">Clients Say</span></h2>
+    </div>
+    <div class="row g-4">
+      <% if (testimonials && testimonials.length > 0) { %>
+        <% testimonials.forEach(t => { %>
+          <div class="col-lg-4 col-md-6">
+            <div class="testimonial-card p-4 h-100">
+              <div class="d-flex align-items-center mb-3">
+                <img src="<%= t.image %>" alt="<%= t.name %>" class="rounded-circle me-3" width="50" height="50" style="object-fit:cover;"
+                     onerror="this.src='/images/default-avatar.png'">
+                <div>
+                  <h6 class="mb-0 text-white"><%= t.name %></h6>
+                  <small class="text-muted"><%= t.event %></small>
+                </div>
+              </div>
+              <div class="text-warning mb-2">
+                <% for(let i = 0; i < t.rating; i++) { %>
+                  <i class="fas fa-star"></i>
+                <% } %>
+              </div>
+              <p class="text-muted mb-0">"<%= t.comment %>"</p>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5">
+  <div class="container py-5 text-center">
+    <h2 class="display-5 fw-bold text-white mb-4">Ready to Create Your Perfect Event?</h2>
+    <p class="lead text-white opacity-75 mb-4">Join thousands of happy clients who trust EventPro for their special occasions.</p>
+    <div class="d-flex justify-content-center gap-3">
+      <a href="/auth/register" class="btn btn-light btn-lg px-5 rounded-pill shadow">
+        <i class="fas fa-user-plus me-2"></i>Get Started Free
+      </a>
+      <a href="/events" class="btn btn-outline-light btn-lg px-5 rounded-pill">
+        <i class="fas fa-phone me-2"></i>Contact Us
+      </a>
+    </div>
+  </div>
+</section>

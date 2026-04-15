@@ -1,0 +1,153 @@
+<div class="admin-topbar">
+  <h4 class="fw-bold mb-0"><i class="fas fa-plus-circle me-2"></i>Add New Event</h4>
+  <a href="/admin/events" class="btn btn-outline-secondary rounded-pill"><i class="fas fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<form action="/admin/events/add" method="POST" enctype="multipart/form-data">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <!-- Basic Info -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h6 class="fw-bold mb-3">Basic Information</h6>
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Event Title *</label>
+            <input type="text" name="title" class="form-control form-control-lg" placeholder="e.g., Grand Wedding Package" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Category *</label>
+            <select name="category" class="form-select form-select-lg" required>
+              <option value="">Select Category</option>
+              <option value="wedding">💒 Wedding</option>
+              <option value="birthday">🎂 Birthday</option>
+              <option value="corporate">🏢 Corporate</option>
+              <option value="concert">🎵 Concert</option>
+              <option value="conference">🎤 Conference</option>
+              <option value="anniversary">💑 Anniversary</option>
+              <option value="baby-shower">👶 Baby Shower</option>
+              <option value="engagement">💍 Engagement</option>
+              <option value="graduation">🎓 Graduation</option>
+              <option value="festival">🎪 Festival</option>
+              <option value="charity">💝 Charity</option>
+              <option value="other">📌 Other</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Duration</label>
+            <input type="text" name="duration" class="form-control form-control-lg" placeholder="e.g., Full Day, 4 Hours" value="Full Day">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Short Description</label>
+            <input type="text" name="shortDescription" class="form-control" placeholder="Brief description (max 300 chars)" maxlength="300">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Full Description *</label>
+            <textarea name="description" class="form-control" rows="6" required maxlength="5000" placeholder="Detailed event description..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h6 class="fw-bold mb-3">Pricing</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Base Price (₹) *</label>
+            <input type="number" name="basePrice" class="form-control form-control-lg" required min="0" placeholder="50000">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Premium Price (₹)</label>
+            <input type="number" name="premiumPrice" class="form-control form-control-lg" min="0" placeholder="150000">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Luxury Price (₹)</label>
+            <input type="number" name="luxuryPrice" class="form-control form-control-lg" min="0" placeholder="500000">
+          </div>
+        </div>
+      </div>
+
+      <!-- Packages -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h6 class="fw-bold mb-3">Packages <small class="text-muted">(Add up to 3 packages)</small></h6>
+        <div id="packages">
+          <div class="row g-2 mb-3 package-row">
+            <div class="col-md-3"><input type="text" name="packageNames" class="form-control" placeholder="Package Name"></div>
+            <div class="col-md-3"><input type="number" name="packagePrices" class="form-control" placeholder="Price" min="0"></div>
+            <div class="col-md-6"><input type="text" name="packageFeatures" class="form-control" placeholder="Features (comma separated)"></div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" onclick="addPackageRow()">
+          <i class="fas fa-plus me-1"></i>Add Package
+        </button>
+      </div>
+
+      <!-- Venue -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h6 class="fw-bold mb-3">Venue Details</h6>
+        <div class="row g-3">
+          <div class="col-md-6"><input type="text" name="venueName" class="form-control" placeholder="Venue Name"></div>
+          <div class="col-md-6"><input type="text" name="venueCity" class="form-control" placeholder="City"></div>
+          <div class="col-12"><input type="text" name="venueAddress" class="form-control" placeholder="Full Address"></div>
+          <div class="col-md-6"><input type="text" name="venueState" class="form-control" placeholder="State"></div>
+          <div class="col-md-6"><input type="number" name="venueCapacity" class="form-control" placeholder="Capacity" value="500"></div>
+        </div>
+      </div>
+
+      <!-- Includes/Excludes -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">What's Included</label>
+            <textarea name="includes" class="form-control" rows="5" placeholder="One item per line&#10;Stage decoration&#10;Photography&#10;Catering"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Not Included</label>
+            <textarea name="excludes" class="form-control" rows="5" placeholder="One item per line&#10;Travel expenses&#10;Personal shopping"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 sticky-top" style="top:20px;">
+        <h6 class="fw-bold mb-3">Settings & Media</h6>
+        <div class="mb-3">
+          <label class="form-label">Event Image *</label>
+          <input type="file" name="eventImage" class="form-control" accept="image/*">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Additional Images</label>
+          <input type="file" name="eventImages" class="form-control" accept="image/*" multiple>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Max Guests</label>
+          <input type="number" name="maxGuests" class="form-control" value="500" min="1">
+        </div>
+        <div class="form-check mb-2">
+          <input type="checkbox" name="isActive" class="form-check-input" id="isActive" checked>
+          <label class="form-check-label" for="isActive">Active</label>
+        </div>
+        <div class="form-check mb-3">
+          <input type="checkbox" name="isFeatured" class="form-check-input" id="isFeatured">
+          <label class="form-check-label" for="isFeatured">Featured</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">
+          <i class="fas fa-save me-2"></i>Create Event
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+function addPackageRow() {
+  const html = `<div class="row g-2 mb-3 package-row">
+    <div class="col-md-3"><input type="text" name="packageNames" class="form-control" placeholder="Package Name"></div>
+    <div class="col-md-3"><input type="number" name="packagePrices" class="form-control" placeholder="Price" min="0"></div>
+    <div class="col-md-5"><input type="text" name="packageFeatures" class="form-control" placeholder="Features (comma separated)"></div>
+    <div class="col-md-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.package-row').remove()"><i class="fas fa-times"></i></button></div>
+  </div>`;
+  document.getElementById('packages').insertAdjacentHTML('beforeend', html);
+}
+</script>

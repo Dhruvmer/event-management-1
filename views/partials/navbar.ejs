@@ -1,0 +1,66 @@
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/home">
+      <i class="fas fa-calendar-star me-2" style="color:#6C63FF"></i>
+      <span style="font-family:'Playfair Display',serif;font-size:1.5rem;">EventPro</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link <%= currentPath === '/home' ? 'active' : '' %>" href="/home">
+            <i class="fas fa-home me-1"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= currentPath === '/events' ? 'active' : '' %>" href="/events">
+            <i class="fas fa-calendar-alt me-1"></i> Events
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= currentPath === '/events/gallery' ? 'active' : '' %>" href="/events/gallery">
+            <i class="fas fa-images me-1"></i> Gallery
+          </a>
+        </li>
+        <% if (currentUser) { %>
+          <li class="nav-item">
+            <a class="nav-link <%= currentPath === '/bookings/my-bookings' ? 'active' : '' %>" href="/bookings/my-bookings">
+              <i class="fas fa-ticket-alt me-1"></i> My Bookings
+            </a>
+          </li>
+        <% } %>
+      </ul>
+      <ul class="navbar-nav">
+        <% if (currentUser) { %>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+              <img src="<%= currentUser.profileImage %>" alt="Profile" class="rounded-circle me-2" width="32" height="32" style="object-fit:cover;">
+              <span><%= currentUser.firstName %></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/auth/profile"><i class="fas fa-user me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="/bookings/my-bookings"><i class="fas fa-ticket-alt me-2"></i>My Bookings</a></li>
+              <% if (isAdmin) { %>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/admin/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</a></li>
+              <% } %>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+          </li>
+        <% } else { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/login"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+          </li>
+          <li class="nav-item ms-2">
+            <a class="btn btn-primary btn-sm px-3 rounded-pill" href="/auth/register">
+              <i class="fas fa-user-plus me-1"></i> Register
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,203 @@
+<section style="margin-top:80px;">
+  <!-- Event Hero -->
+  <div class="position-relative" style="height:400px;overflow:hidden;">
+    <img src="<%= event.eventImage %>" alt="<%= event.title %>" class="w-100 h-100" style="object-fit:cover;filter:brightness(0.5);"
+         onerror="this.src='/images/default-event.jpg'">
+    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center">
+      <div class="container text-white">
+        <span class="badge bg-primary mb-3 px-3 py-2"><%= getCategoryName(event.category) %></span>
+        <h1 class="display-4 fw-bold"><%= event.title %></h1>
+        <div class="d-flex align-items-center gap-4 mt-3">
+          <span><i class="fas fa-users me-2"></i><%= event.maxGuests %> Max Guests</span>
+          <span><i class="fas fa-clock me-2"></i><%= event.duration %></span>
+          <span class="text-warning">
+            <% for(let i = 0; i < 5; i++) { %>
+              <i class="fas fa-star<%= i < Math.round(event.averageRating) ? '' : ' opacity-25' %>"></i>
+            <% } %>
+            (<%= event.reviews?.length || 0 %> reviews)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <div class="row g-4">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Description -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h4 class="fw-bold mb-3"><i class="fas fa-info-circle text-primary me-2"></i>About This Event</h4>
+          <p class="text-muted" style="line-height:1.8;white-space:pre-line;"><%= event.description %></p>
+        </div>
+
+        <!-- Features -->
+        <% if (event.features && event.features.length > 0) { %>
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h4 class="fw-bold mb-3"><i class="fas fa-star text-primary me-2"></i>Key Features</h4>
+          <div class="row g-3">
+            <% event.features.forEach(feature => { %>
+              <div class="col-md-6">
+                <div class="d-flex align-items-start p-3 bg-light rounded-3">
+                  <i class="<%= feature.icon || 'fas fa-check-circle' %> text-primary mt-1 me-3"></i>
+                  <div>
+                    <h6 class="fw-bold mb-1"><%= feature.title %></h6>
+                    <small class="text-muted"><%= feature.description %></small>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- What's Included -->
+        <% if ((event.includes && event.includes.length) || (event.excludes && event.excludes.length)) { %>
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <div class="row">
+            <% if (event.includes && event.includes.length) { %>
+            <div class="col-md-6">
+              <h5 class="fw-bold text-success mb-3"><i class="fas fa-check-circle me-2"></i>What's Included</h5>
+              <ul class="list-unstyled">
+                <% event.includes.forEach(item => { %>
+                  <li class="mb-2"><i class="fas fa-check text-success me-2"></i><%= item %></li>
+                <% }) %>
+              </ul>
+            </div>
+            <% } %>
+            <% if (event.excludes && event.excludes.length) { %>
+            <div class="col-md-6">
+              <h5 class="fw-bold text-danger mb-3"><i class="fas fa-times-circle me-2"></i>Not Included</h5>
+              <ul class="list-unstyled">
+                <% event.excludes.forEach(item => { %>
+                  <li class="mb-2"><i class="fas fa-times text-danger me-2"></i><%= item %></li>
+                <% }) %>
+              </ul>
+            </div>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- Packages -->
+        <% if (event.packages && event.packages.length > 0) { %>
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h4 class="fw-bold mb-4"><i class="fas fa-box text-primary me-2"></i>Available Packages</h4>
+          <div class="row g-3">
+            <% event.packages.forEach((pkg, index) => { %>
+              <div class="col-md-4">
+                <div class="card h-100 rounded-4 <%= pkg.isPopular ? 'border-primary shadow' : 'border' %>">
+                  <% if (pkg.isPopular) { %>
+                    <div class="text-center"><span class="badge bg-primary rounded-0 rounded-bottom px-3 py-1">Most Popular</span></div>
+                  <% } %>
+                  <div class="card-body text-center p-4">
+                    <h5 class="fw-bold"><%= pkg.name %></h5>
+                    <h3 class="text-primary fw-bold my-3">₹<%= pkg.price.toLocaleString('en-IN') %></h3>
+                    <ul class="list-unstyled text-start">
+                      <% if (pkg.features) { pkg.features.forEach(f => { %>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i><%= f %></li>
+                      <% }) } %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- Event Images Gallery -->
+        <% if (event.eventImages && event.eventImages.length > 0) { %>
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h4 class="fw-bold mb-3"><i class="fas fa-images text-primary me-2"></i>Event Gallery</h4>
+          <div class="row g-2">
+            <% event.eventImages.forEach(img => { %>
+              <div class="col-4">
+                <img src="<%= img %>" alt="Event image" class="img-fluid rounded-3 w-100" style="height:150px;object-fit:cover;"
+                     onerror="this.src='/images/default-event.jpg'">
+              </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Booking Card -->
+        <div class="card border-0 shadow rounded-4 p-4 sticky-top" style="top:100px;">
+          <div class="text-center mb-3">
+            <small class="text-muted">Starting from</small>
+            <h2 class="fw-bold text-primary mb-0">₹<%= event.pricing.basePrice.toLocaleString('en-IN') %></h2>
+            <% if (event.pricing.premiumPrice) { %>
+              <small class="text-muted">Premium: ₹<%= event.pricing.premiumPrice.toLocaleString('en-IN') %></small>
+            <% } %>
+          </div>
+          
+          <a href="/bookings/book/<%= event.slug %>" class="btn btn-primary btn-lg w-100 rounded-pill mb-3">
+            <i class="fas fa-ticket-alt me-2"></i>Book This Event
+          </a>
+          
+          <hr>
+          
+          <!-- Venue Info -->
+          <% if (event.venue && event.venue.name) { %>
+          <div class="mb-3">
+            <h6 class="fw-bold"><i class="fas fa-map-marker-alt text-primary me-2"></i>Venue</h6>
+            <p class="text-muted small mb-0"><%= event.venue.name %></p>
+            <p class="text-muted small mb-0"><%= event.venue.address %>, <%= event.venue.city %></p>
+          </div>
+          <% } %>
+
+          <div class="mb-3">
+            <h6 class="fw-bold"><i class="fas fa-clock text-primary me-2"></i>Duration</h6>
+            <p class="text-muted small mb-0"><%= event.duration %></p>
+          </div>
+
+          <div class="mb-3">
+            <h6 class="fw-bold"><i class="fas fa-users text-primary me-2"></i>Max Guests</h6>
+            <p class="text-muted small mb-0">Up to <%= event.maxGuests %> guests</p>
+          </div>
+
+          <div class="mb-3">
+            <h6 class="fw-bold"><i class="fas fa-fire text-primary me-2"></i>Bookings</h6>
+            <p class="text-muted small mb-0"><%= event.totalBookings %> times booked</p>
+          </div>
+
+          <!-- Share -->
+          <hr>
+          <div class="text-center">
+            <p class="small text-muted mb-2">Share this event</p>
+            <div class="d-flex justify-content-center gap-2">
+              <a href="#" class="btn btn-outline-primary btn-sm rounded-circle" style="width:36px;height:36px;"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="btn btn-outline-info btn-sm rounded-circle" style="width:36px;height:36px;"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="btn btn-outline-success btn-sm rounded-circle" style="width:36px;height:36px;"><i class="fab fa-whatsapp"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Events -->
+    <% if (relatedEvents && relatedEvents.length > 0) { %>
+    <div class="mt-5">
+      <h4 class="fw-bold mb-4">Related Events</h4>
+      <div class="row g-4">
+        <% relatedEvents.forEach(re => { %>
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+              <img src="<%= re.eventImage %>" class="card-img-top" alt="<%= re.title %>" style="height:180px;object-fit:cover;"
+                   onerror="this.src='/images/default-event.jpg'">
+              <div class="card-body">
+                <h6 class="fw-bold"><%= re.title %></h6>
+                <p class="text-primary fw-bold">₹<%= re.pricing.basePrice.toLocaleString('en-IN') %></p>
+                <a href="/events/<%= re.slug %>" class="btn btn-outline-primary btn-sm rounded-pill w-100">View Details</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</section>

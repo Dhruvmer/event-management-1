@@ -1,0 +1,185 @@
+<!-- Top Bar -->
+<div class="admin-topbar">
+  <div>
+    <h4 class="fw-bold mb-0">Dashboard</h4>
+    <small class="text-muted">Welcome back, <%= currentUser?.firstName || 'Admin' %>!</small>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <span class="text-muted"><i class="fas fa-clock me-1"></i><%= new Date().toLocaleDateString('en-IN', { dateStyle: 'long' }) %></span>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-3 col-md-6">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <small class="text-muted">Total Users</small>
+          <h3 class="fw-bold mb-0"><%= totalUsers %></h3>
+        </div>
+        <div class="stat-icon" style="background:#e8f5e9;color:#4caf50;">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <small class="text-muted">Total Events</small>
+          <h3 class="fw-bold mb-0"><%= totalEvents %></h3>
+        </div>
+        <div class="stat-icon" style="background:#e3f2fd;color:#2196f3;">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <small class="text-muted">Total Bookings</small>
+          <h3 class="fw-bold mb-0"><%= totalBookings %></h3>
+        </div>
+        <div class="stat-icon" style="background:#fff3e0;color:#ff9800;">
+          <i class="fas fa-ticket-alt"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <small class="text-muted">Total Revenue</small>
+          <h3 class="fw-bold mb-0">₹<%= totalRevenue.toLocaleString('en-IN') %></h3>
+        </div>
+        <div class="stat-icon" style="background:#e8eaf6;color:#6C63FF;">
+          <i class="fas fa-rupee-sign"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts & Tables Row -->
+<div class="row g-4 mb-4">
+  <!-- Booking Status Chart -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+      <h6 class="fw-bold mb-3">Booking Status</h6>
+      <canvas id="bookingStatusChart" height="220"></canvas>
+    </div>
+  </div>
+  <!-- Revenue Chart -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+      <h6 class="fw-bold mb-3">Monthly Revenue</h6>
+      <canvas id="revenueChart" height="160"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Data -->
+<div class="row g-4">
+  <!-- Recent Bookings -->
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0">Recent Bookings</h6>
+        <a href="/admin/bookings" class="btn btn-sm btn-outline-primary rounded-pill">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead><tr><th>ID</th><th>User</th><th>Event</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <% recentBookings.forEach(b => { %>
+              <tr>
+                <td><small class="fw-bold"><%= b.bookingId %></small></td>
+                <td><%= b.user?.firstName %> <%= b.user?.lastName %></td>
+                <td><%= b.event?.title || 'N/A' %></td>
+                <td class="fw-bold">₹<%= (b.totalAmount || 0).toLocaleString('en-IN') %></td>
+                <td>
+                  <span class="badge bg-<%= b.status === 'confirmed' ? 'success' : b.status === 'pending' ? 'warning' : b.status === 'completed' ? 'info' : 'danger' %>">
+                    <%= b.status %>
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Users -->
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0">Recent Users</h6>
+        <a href="/admin/users" class="btn btn-sm btn-outline-primary rounded-pill">View All</a>
+      </div>
+      <% recentUsers.forEach(u => { %>
+        <div class="d-flex align-items-center py-2 border-bottom">
+          <img src="<%= u.profileImage %>" alt="" class="rounded-circle me-3" width="40" height="40" style="object-fit:cover;"
+               onerror="this.src='/images/default-avatar.png'">
+          <div class="flex-grow-1">
+            <h6 class="mb-0 small fw-bold"><%= u.fullName %></h6>
+            <small class="text-muted"><%= u.email %></small>
+          </div>
+          <small class="text-muted"><%= new Date(u.createdAt).toLocaleDateString('en-IN') %></small>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Booking Status Doughnut
+  const statusData = <%= JSON.stringify(statusMap) %>;
+  new Chart(document.getElementById('bookingStatusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+      datasets: [{
+        data: [statusData.pending || 0, statusData.confirmed || 0, statusData.completed || 0, statusData.cancelled || 0],
+        backgroundColor: ['#ffc107', '#28a745', '#17a2b8', '#dc3545'],
+        borderWidth: 0
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+  });
+
+  // Revenue Line Chart
+  const monthlyData = <%= JSON.stringify(monthlyRevenue) %>;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const revenueByMonth = new Array(12).fill(0);
+  monthlyData.forEach(m => { revenueByMonth[m._id - 1] = m.revenue; });
+
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: revenueByMonth,
+        borderColor: '#6C63FF',
+        backgroundColor: 'rgba(108,99,255,0.1)',
+        fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointBackgroundColor: '#6C63FF'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { callback: v => '₹' + v.toLocaleString() } } }
+    }
+  });
+});
+</script>

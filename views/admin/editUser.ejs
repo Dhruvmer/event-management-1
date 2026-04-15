@@ -1,0 +1,134 @@
+<div class="admin-topbar">
+  <h4 class="fw-bold mb-0"><i class="fas fa-user-edit me-2"></i>Edit User</h4>
+  <a href="/admin/users" class="btn btn-outline-secondary rounded-pill">
+    <i class="fas fa-arrow-left me-2"></i>Back to Users
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-4">
+    <form action="/admin/users/edit/<%= user._id %>" method="POST" enctype="multipart/form-data" novalidate>
+      <div class="row g-3">
+        <!-- Personal Information -->
+        <div class="col-12">
+          <h5 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Personal Information</h5>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">First Name *</label>
+          <input type="text" name="firstName" class="form-control" value="<%= user.firstName %>" required>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Last Name *</label>
+          <input type="text" name="lastName" class="form-control" value="<%= user.lastName %>" required>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Email Address *</label>
+          <input type="email" name="email" class="form-control" value="<%= user.email %>" required>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Phone Number *</label>
+          <input type="tel" name="phone" class="form-control" value="<%= user.phone %>" required>
+        </div>
+        
+        <div class="col-12">
+          <label class="form-label fw-500">Profile Image</label>
+          <div class="d-flex gap-3 align-items-center">
+            <img src="<%= user.profileImage %>" alt="Current Profile" class="rounded-circle" 
+                 width="60" height="60" style="object-fit:cover;" onerror="this.src='/images/default-avatar.png'">
+            <div class="flex-grow-1">
+              <input type="file" name="profileImage" class="form-control" accept="image/*">
+              <small class="text-muted">Leave blank to keep current image</small>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Address Information -->
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Address Information</h5>
+        </div>
+        
+        <div class="col-md-4">
+          <label class="form-label fw-500">City</label>
+          <input type="text" name="city" class="form-control" value="<%= user.address?.city || '' %>">
+        </div>
+        
+        <div class="col-md-4">
+          <label class="form-label fw-500">State</label>
+          <input type="text" name="state" class="form-control" value="<%= user.address?.state || '' %>">
+        </div>
+        
+        <div class="col-md-4">
+          <label class="form-label fw-500">Country</label>
+          <input type="text" name="country" class="form-control" value="<%= user.address?.country || '' %>">
+        </div>
+        
+        <!-- Account Information -->
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-lock text-primary me-2"></i>Account Information</h5>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">New Password</label>
+          <input type="password" name="password" class="form-control" minlength="6">
+          <small class="text-muted">Leave blank to keep current password</small>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Confirm New Password</label>
+          <input type="password" name="confirmPassword" class="form-control" minlength="6">
+          <small class="text-muted">Must match new password</small>
+        </div>
+        
+        <!-- User Status -->
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-toggle-on text-primary me-2"></i>User Status</h5>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Account Status</label>
+          <select name="isActive" class="form-select">
+            <option value="true" <%= user.isActive ? 'selected' : '' %>>Active</option>
+            <option value="false" <%= !user.isActive ? 'selected' : '' %>>Inactive</option>
+          </select>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="col-12 mt-4">
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill" onclick="return confirm('Are you sure you want to update this user?')">
+              <i class="fas fa-save me-2"></i>Update User
+            </button>
+            <a href="/admin/users" class="btn btn-outline-secondary btn-lg rounded-pill">
+              <i class="fas fa-times me-2"></i>Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+  const password = document.querySelector('input[name="password"]').value;
+  const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+  
+  // If password fields are filled, they must match
+  if (password || confirmPassword) {
+    if (password !== confirmPassword) {
+      e.preventDefault();
+      alert('Passwords do not match!');
+      return false;
+    }
+    if (password.length < 6) {
+      e.preventDefault();
+      alert('Password must be at least 6 characters!');
+      return false;
+    }
+  }
+});
+</script>

@@ -1,0 +1,126 @@
+<section style="margin-top:80px;min-height:100vh;" class="bg-light py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="p-4 text-white text-center" style="background:linear-gradient(135deg,#6C63FF,#5a52d5);">
+            <i class="fas fa-lock fa-2x mb-2"></i>
+            <h4 class="fw-bold mb-1">Secure Payment</h4>
+            <p class="opacity-75 mb-0">Complete your booking payment</p>
+          </div>
+          <div class="card-body p-4">
+            <!-- Booking Summary -->
+            <div class="bg-light rounded-3 p-3 mb-4">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Booking ID:</span>
+                <span class="fw-bold"><%= booking.bookingId %></span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Event:</span>
+                <span class="fw-bold"><%= booking.event?.title || 'Event' %></span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Date:</span>
+                <span><%= new Date(booking.eventDate).toLocaleDateString('en-IN', { dateStyle: 'long' }) %></span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Package:</span>
+                <span><%= booking.selectedPackage?.name %></span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Subtotal:</span>
+                <span>₹<%= (booking.subtotal || 0).toLocaleString('en-IN') %></span>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">GST (18%):</span>
+                <span>₹<%= (booking.tax || 0).toLocaleString('en-IN') %></span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between">
+                <span class="fw-bold fs-5">Total Amount:</span>
+                <span class="fw-bold fs-5 text-primary">₹<%= (booking.totalAmount || 0).toLocaleString('en-IN') %></span>
+              </div>
+            </div>
+
+            <!-- Pay Button -->
+            <button id="payBtn" class="btn btn-primary btn-lg w-100 rounded-pill" onclick="initiatePayment()">
+              <i class="fas fa-credit-card me-2"></i>Pay ₹<%= (booking.totalAmount || 0).toLocaleString('en-IN') %>
+            </button>
+
+            <div class="text-center mt-3">
+              <small class="text-muted">
+                <i class="fas fa-shield-alt text-success me-1"></i>
+                Secured by Razorpay | 256-bit SSL Encryption
+              </small>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="text-center mt-3">
+              <img src="https://cdn.razorpay.com/static/assets/logo/payment.svg" alt="Payment Methods" style="height:24px;opacity:0.6;" onerror="this.style.display='none'">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+function initiatePayment() {
+  const options = {
+    key: '<%= razorpayKey %>',
+    amount: '<%= Math.round(booking.totalAmount * 100) %>',
+    currency: 'INR',
+    name: 'EventPro',
+    description: 'Event Booking - <%= booking.bookingId %>',
+    order_id: '<%= order.id %>',
+    handler: function(response) {
+      // Verify payment
+      fetch('/payment/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          bookingId: '<%= booking._id %>'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = data.redirectUrl;
+        } else {
+          alert('Payment verification failed. Please contact support.');
+        }
+      })
+      .catch(err => {
+        console.error('Verification error:', err);
+        alert('Payment verification failed. Please contact support.');
+      });
+    },
+    prefill: {
+      name: '<%= user.firstName %> <%= user.lastName %>',
+      email: '<%= booking.contactEmail %>',
+      contact: '<%= booking.contactPhone %>'
+    },
+    theme: {
+      color: '#6C63FF'
+    },
+    modal: {
+      ondismiss: function() {
+        fetch('/payment/failed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId: '<%= booking._id %>' })
+        });
+      }
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
+</script>

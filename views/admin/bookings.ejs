@@ -1,0 +1,112 @@
+<div class="admin-topbar">
+  <h4 class="fw-bold mb-0"><i class="fas fa-ticket-alt me-2"></i>Booking Management</h4>
+  <form action="/admin/bookings" method="GET" class="d-flex gap-2">
+    <input type="text" name="search" class="form-control rounded-pill" placeholder="Search booking ID, name..." value="<%= searchQuery %>" style="width:200px;">
+    <select name="status" class="form-select rounded-pill" style="width:auto;">
+      <option value="all">All Status</option>
+      <option value="pending" <%= currentStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+      <option value="confirmed" <%= currentStatus === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+      <option value="completed" <%= currentStatus === 'completed' ? 'selected' : '' %>>Completed</option>
+      <option value="cancelled" <%= currentStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+    </select>
+    <select name="payment" class="form-select rounded-pill" style="width:auto;">
+      <option value="all">All Payment</option>
+      <option value="pending" <%= currentPayment === 'pending' ? 'selected' : '' %>>Pending</option>
+      <option value="completed" <%= currentPayment === 'completed' ? 'selected' : '' %>>Completed</option>
+      <option value="failed" <%= currentPayment === 'failed' ? 'selected' : '' %>>Failed</option>
+    </select>
+    <button type="submit" class="btn btn-primary rounded-pill"><i class="fas fa-filter"></i></button>
+  </form>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">Booking ID</th>
+            <th>User</th>
+            <th>Event</th>
+            <th>Date</th>
+            <th>Guests</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% bookings.forEach(booking => { %>
+            <tr>
+              <td class="ps-4"><strong class="small"><%= booking.bookingId %></strong></td>
+              <td>
+                <div>
+                  <small class="fw-bold d-block"><%= booking.user?.firstName %> <%= booking.user?.lastName %></small>
+                  <small class="text-muted"><%= booking.user?.email %></small>
+                </div>
+              </td>
+              <td><%= booking.event?.title || 'N/A' %></td>
+              <td><small><%= new Date(booking.eventDate).toLocaleDateString('en-IN') %></small></td>
+              <td><%= booking.guestCount %></td>
+              <td class="fw-bold">₹<%= (booking.totalAmount || 0).toLocaleString('en-IN') %></td>
+              <td>
+                <span class="badge bg-<%= booking.paymentStatus === 'completed' ? 'success' : booking.paymentStatus === 'pending' ? 'warning' : 'danger' %>">
+                  <%= booking.paymentStatus %>
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'completed' ? 'info' : 'danger' %>">
+                  <%= booking.status %>
+                </span>
+              </td>
+              <td>
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-outline-secondary rounded-pill dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-cog"></i>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <form action="/admin/bookings/<%= booking._id %>/update-status" method="POST">
+                        <input type="hidden" name="status" value="confirmed">
+                        <button class="dropdown-item text-success" onclick="return confirm('Are you sure you want to confirm this booking?')">
+                          <i class="fas fa-check me-2"></i>Confirm
+                        </button>
+                      </form>
+                    </li>
+                    <li>
+                      <form action="/admin/bookings/<%= booking._id %>/update-status" method="POST">
+                        <input type="hidden" name="status" value="completed">
+                        <button class="dropdown-item text-info" onclick="return confirm('Are you sure you want to mark this booking as completed?')">
+                          <i class="fas fa-check-double me-2"></i>Complete
+                        </button>
+                      </form>
+                    </li>
+                    <li>
+                      <form action="/admin/bookings/<%= booking._id %>/update-status" method="POST">
+                        <input type="hidden" name="status" value="cancelled">
+                        <button class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to cancel this booking? This action cannot be undone.')">
+                          <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<% if (pagination.totalPages > 1) { %>
+  <nav class="mt-4"><ul class="pagination justify-content-center">
+    <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+      <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+        <a class="page-link" href="/admin/bookings?page=<%= i %>&status=<%= currentStatus %>&payment=<%= currentPayment %>"><%= i %></a>
+      </li>
+    <% } %>
+  </ul></nav>
+<% } %>

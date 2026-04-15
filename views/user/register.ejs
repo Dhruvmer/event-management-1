@@ -1,0 +1,93 @@
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="auth-card overflow-hidden">
+          <div class="row g-0">
+            <div class="col-md-5 d-none d-md-block">
+              <div class="auth-sidebar h-100 d-flex flex-column justify-content-center align-items-center text-white p-4" 
+                   style="background:linear-gradient(135deg,#6C63FF,#5a52d5,#4834d4);">
+                <i class="fas fa-calendar-star fa-4x mb-4 opacity-75"></i>
+                <h3 class="fw-bold">Join EventPro</h3>
+                <p class="text-center opacity-75">Create your account and start booking amazing events today!</p>
+                <div class="mt-4 text-center">
+                  <small>Already have an account?</small><br>
+                  <a href="/auth/login" class="btn btn-outline-light btn-sm mt-2 rounded-pill px-4">Login Here</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="p-4 p-md-5">
+                <h3 class="fw-bold mb-1">Create Account</h3>
+                <p class="text-muted mb-4">Fill in your details to get started</p>
+                
+                <form action="/auth/register" method="POST" enctype="multipart/form-data" id="registerForm" novalidate>
+                  <div class="row g-3">
+                    <div class="col-6">
+                      <label class="form-label fw-500">First Name *</label>
+                      <input type="text" name="firstName" class="form-control form-control-lg rounded-3" placeholder="John" required minlength="2" maxlength="50" pattern="[a-zA-Z\s]+">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label fw-500">Last Name *</label>
+                      <input type="text" name="lastName" class="form-control form-control-lg rounded-3" placeholder="Doe" required minlength="2" maxlength="50" pattern="[a-zA-Z\s]+">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label fw-500">Email Address *</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" name="email" class="form-control form-control-lg" placeholder="john@example.com" required>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label fw-500">Phone Number *</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <input type="tel" name="phone" class="form-control form-control-lg" placeholder="+91 98765 43210" required pattern="[+]?[0-9]{10,15}">
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label fw-500">Password *</label>
+                      <input type="password" name="password" class="form-control form-control-lg rounded-3" placeholder="••••••••" required minlength="8" id="password">
+                      <div class="password-strength mt-1" id="passwordStrength"></div>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label fw-500">Confirm Password *</label>
+                      <input type="password" name="confirmPassword" class="form-control form-control-lg rounded-3" placeholder="••••••••" required>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label fw-500">Profile Image</label>
+                      <input type="file" name="profileImage" class="form-control" accept="image/jpeg,image/png,image/webp">
+                      <small class="text-muted">Max 5MB - JPG, PNG, WebP</small>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label fw-500">City</label>
+                      <input type="text" name="city" class="form-control" placeholder="Mumbai">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label fw-500">State</label>
+                      <input type="text" name="state" class="form-control" placeholder="Maharashtra">
+                    </div>
+                    <div class="col-12">
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="terms" required>
+                        <label class="form-check-label small" for="terms">
+                          I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                <p class="text-center text-muted mt-3 d-md-none">
+                  Already have an account? <a href="/auth/login">Login here</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

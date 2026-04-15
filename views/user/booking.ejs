@@ -1,0 +1,158 @@
+<section style="margin-top:80px;min-height:100vh;" class="bg-light">
+  <div class="page-header py-4 text-white" style="background:linear-gradient(135deg,#6C63FF,#5a52d5);">
+    <div class="container">
+      <h2 class="fw-bold mb-1"><i class="fas fa-ticket-alt me-2"></i>Book Event</h2>
+      <p class="opacity-75 mb-0"><%= event.title %></p>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <form action="/bookings/create" method="POST" enctype="multipart/form-data" id="bookingForm" novalidate>
+          <input type="hidden" name="eventId" value="<%= event._id %>">
+          
+          <!-- Event Details -->
+          <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-calendar text-primary me-2"></i>Event Details</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-500">Event Date *</label>
+                <input type="date" name="eventDate" class="form-control form-control-lg rounded-3" required 
+                       min="<%= new Date(Date.now() + 86400000).toISOString().split('T')[0] %>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-500">Event Time *</label>
+                <input type="time" name="eventTime" class="form-control form-control-lg rounded-3" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-500">Number of Guests *</label>
+                <input type="number" name="guestCount" class="form-control form-control-lg rounded-3" 
+                       required min="1" max="<%= event.maxGuests %>" placeholder="e.g., 200">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-500">Venue Name</label>
+                <input type="text" name="venueName" class="form-control form-control-lg rounded-3" 
+                       placeholder="e.g., Grand Ballroom" value="<%= event.venue?.name || '' %>">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-500">Venue Address</label>
+                <textarea name="venueAddress" class="form-control rounded-3" rows="2" 
+                          placeholder="Full venue address"><%= event.venue?.address || '' %></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Details -->
+          <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Contact Details</h5>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-500">Contact Name *</label>
+                <input type="text" name="contactName" class="form-control form-control-lg rounded-3" 
+                       required value="<%= user.firstName + ' ' + user.lastName %>" minlength="2">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-500">Contact Email *</label>
+                <input type="email" name="contactEmail" class="form-control form-control-lg rounded-3" 
+                       required value="<%= user.email %>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-500">Contact Phone *</label>
+                <input type="tel" name="contactPhone" class="form-control form-control-lg rounded-3" 
+                       required value="<%= user.phone %>" pattern="[+]?[0-9]{10,15}">
+              </div>
+            </div>
+          </div>
+
+          <!-- Package Selection -->
+          <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-box text-primary me-2"></i>Select Package *</h5>
+            <div class="row g-3">
+              <% if (event.packages && event.packages.length > 0) { %>
+                <% event.packages.forEach((pkg, index) => { %>
+                  <div class="col-md-4">
+                    <div class="form-check package-card p-3 rounded-3 border h-100">
+                      <input type="radio" name="selectedPackage" value="<%= index %>" 
+                             class="form-check-input" id="pkg-<%= index %>" <%= index === 0 ? 'checked' : '' %> required>
+                      <label class="form-check-label w-100 cursor-pointer" for="pkg-<%= index %>">
+                        <h6 class="fw-bold mb-1"><%= pkg.name %></h6>
+                        <h5 class="text-primary fw-bold">₹<%= pkg.price.toLocaleString('en-IN') %></h5>
+                        <% if (pkg.features) { pkg.features.forEach(f => { %>
+                          <small class="d-block text-muted"><i class="fas fa-check text-success me-1"></i><%= f %></small>
+                        <% }) } %>
+                        <% if (pkg.isPopular) { %>
+                          <span class="badge bg-primary mt-2">Popular</span>
+                        <% } %>
+                      </label>
+                    </div>
+                  </div>
+                <% }) %>
+              <% } else { %>
+                <div class="col-12">
+                  <input type="hidden" name="selectedPackage" value="base">
+                  <div class="alert alert-info">
+                    <strong>Base Package: ₹<%= event.pricing.basePrice.toLocaleString('en-IN') %></strong>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Special Requirements -->
+          <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-clipboard-list text-primary me-2"></i>Additional Information</h5>
+            <div class="mb-3">
+              <label class="form-label fw-500">Special Requirements</label>
+              <textarea name="specialRequirements" class="form-control rounded-3" rows="4" 
+                        placeholder="Any special decorations, theme preferences, dietary requirements, etc." maxlength="2000"></textarea>
+            </div>
+            <div>
+              <label class="form-label fw-500">Upload Document (Optional)</label>
+              <input type="file" name="bookingDocument" class="form-control" accept="image/*,application/pdf">
+              <small class="text-muted">Upload reference images or documents (Max 5MB)</small>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill" onclick="return confirm('Are you sure you want to book this event: <%= event.title %>? Please review all details before proceeding.')">
+            <i class="fas fa-arrow-right me-2"></i>Proceed to Payment
+          </button>
+        </form>
+      </div>
+
+      <!-- Sidebar Summary -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow rounded-4 p-4 sticky-top" style="top:100px;">
+          <h5 class="fw-bold mb-3">Booking Summary</h5>
+          <div class="d-flex align-items-center mb-3">
+            <img src="<%= event.eventImage %>" alt="<%= event.title %>" class="rounded-3 me-3" 
+                 style="width:60px;height:60px;object-fit:cover;" onerror="this.src='/images/default-event.jpg'">
+            <div>
+              <h6 class="fw-bold mb-0"><%= event.title %></h6>
+              <small class="text-muted"><%= event.category %></small>
+            </div>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Base Price:</span>
+            <span class="fw-bold" id="summaryPrice">₹<%= event.pricing.basePrice.toLocaleString('en-IN') %></span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">GST (18%):</span>
+            <span class="fw-bold" id="summaryTax">₹<%= Math.round(event.pricing.basePrice * 0.18).toLocaleString('en-IN') %></span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-3">
+            <span class="fw-bold fs-5">Total:</span>
+            <span class="fw-bold fs-5 text-primary" id="summaryTotal">₹<%= Math.round(event.pricing.basePrice * 1.18).toLocaleString('en-IN') %></span>
+          </div>
+          <div class="bg-light rounded-3 p-3">
+            <small class="text-muted d-block"><i class="fas fa-shield-alt text-success me-1"></i> Secure payment via Razorpay</small>
+            <small class="text-muted d-block mt-1"><i class="fas fa-undo text-info me-1"></i> Free cancellation up to 48 hours before</small>
+            <small class="text-muted d-block mt-1"><i class="fas fa-file-pdf text-danger me-1"></i> Instant PDF confirmation</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

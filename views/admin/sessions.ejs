@@ -1,0 +1,69 @@
+<div class="admin-topbar">
+  <h4 class="fw-bold mb-0"><i class="fas fa-desktop me-2"></i>Session Management</h4>
+  <div class="d-flex gap-2">
+    <a href="/admin/sessions" class="btn btn-sm rounded-pill <%= currentStatus === 'all' ? 'btn-primary' : 'btn-outline-primary' %>">All</a>
+    <a href="/admin/sessions?status=active" class="btn btn-sm rounded-pill <%= currentStatus === 'active' ? 'btn-success' : 'btn-outline-success' %>">Active</a>
+    <a href="/admin/sessions?status=inactive" class="btn btn-sm rounded-pill <%= currentStatus === 'inactive' ? 'btn-secondary' : 'btn-outline-secondary' %>">Expired</a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">User</th>
+            <th>Browser</th>
+            <th>OS</th>
+            <th>Device</th>
+            <th>IP Address</th>
+            <th>Login Time</th>
+            <th>Logout Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% sessions.forEach(session => { %>
+            <tr>
+              <td class="ps-4">
+                <div class="d-flex align-items-center">
+                  <img src="<%= session.user?.profileImage || '/images/default-avatar.png' %>" class="rounded-circle me-2" width="32" height="32" style="object-fit:cover;"
+                       onerror="this.src='/images/default-avatar.png'">
+                  <div>
+                    <strong class="d-block small"><%= session.user?.firstName %> <%= session.user?.lastName %></strong>
+                    <small class="text-muted"><%= session.user?.email %></small>
+                  </div>
+                </div>
+              </td>
+              <td><i class="fab fa-<%= (session.browser || '').toLowerCase() === 'chrome' ? 'chrome' : (session.browser || '').toLowerCase() === 'firefox' ? 'firefox' : 'globe' %> me-1"></i><%= session.browser || 'Unknown' %></td>
+              <td><%= session.os || 'Unknown' %></td>
+              <td><i class="fas fa-<%= session.device === 'Mobile' ? 'mobile-alt' : session.device === 'Tablet' ? 'tablet-alt' : 'desktop' %> me-1"></i><%= session.device || 'Desktop' %></td>
+              <td><code><%= session.ipAddress || 'N/A' %></code></td>
+              <td><small><%= session.loginAt ? new Date(session.loginAt).toLocaleString('en-IN') : 'N/A' %></small></td>
+              <td><small><%= session.logoutAt ? new Date(session.logoutAt).toLocaleString('en-IN') : '-' %></small></td>
+              <td>
+                <span class="badge bg-<%= session.isActive ? 'success' : 'secondary' %>">
+                  <i class="fas fa-circle me-1" style="font-size:8px;"></i>
+                  <%= session.isActive ? 'Active' : 'Expired' %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<% if (pagination.totalPages > 1) { %>
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
+      <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+        <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+          <a class="page-link" href="/admin/sessions?page=<%= i %>&status=<%= currentStatus %>"><%= i %></a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+<% } %>

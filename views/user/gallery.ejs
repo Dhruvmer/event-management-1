@@ -1,0 +1,113 @@
+<section style="margin-top:80px;min-height:100vh;">
+  <div class="page-header py-5 text-white text-center" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);">
+    <div class="container">
+      <h1 class="display-4 fw-bold">Our <span class="gradient-text">Gallery</span></h1>
+      <p class="lead opacity-75">Browse through our portfolio of successfully organized events</p>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <!-- Category Filter -->
+    <div class="d-flex gap-2 mb-4 flex-wrap justify-content-center">
+      <a href="/events/gallery" class="btn btn-sm rounded-pill <%= currentCategory === 'all' ? 'btn-primary' : 'btn-outline-primary' %>">All</a>
+      <% categories.forEach(cat => { %>
+        <a href="/events/gallery?category=<%= cat %>" class="btn btn-sm rounded-pill <%= currentCategory === cat ? 'btn-primary' : 'btn-outline-primary' %>">
+          <%= getCategoryName(cat) %>
+        </a>
+      <% }) %>
+    </div>
+
+    <% if (galleries.length === 0) { %>
+      <div class="text-center py-5">
+        <i class="fas fa-images fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">No gallery items found</h4>
+      </div>
+    <% } else { %>
+      <div class="row g-4">
+        <% galleries.forEach(gallery => { %>
+          <div class="col-lg-4 col-md-6">
+            <a href="/events/gallery/<%= gallery._id %>" class="text-decoration-none">
+              <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 gallery-card">
+              <div class="position-relative">
+                <% if (gallery.images && gallery.images.length > 0) { %>
+                  <img src="<%= gallery.images[0].url %>" alt="<%= gallery.title %>" class="card-img-top" 
+                       style="height:250px;object-fit:cover;" onerror="this.src='/images/default-event.jpg'">
+                  <% if (gallery.images.length > 1) { %>
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75">
+                      <i class="fas fa-images me-1"></i><%= gallery.images.length %> photos
+                    </span>
+                  <% } %>
+                <% } %>
+                <% if (gallery.isFeatured) { %>
+                  <span class="position-absolute top-0 start-0 m-2 badge bg-warning"><i class="fas fa-star"></i> Featured</span>
+                <% } %>
+              </div>
+              <div class="card-body p-4">
+                <span class="badge bg-primary bg-opacity-10 text-primary mb-2"><%= getCategoryName(gallery.category) %></span>
+                <h5 class="fw-bold"><%= gallery.title %></h5>
+                <% if (gallery.description) { %>
+                  <p class="text-muted small"><%= gallery.description.substring(0, 100) %>...</p>
+                <% } %>
+                <div class="d-flex justify-content-between align-items-center">
+                  <% if (gallery.venue) { %>
+                    <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i><%= gallery.venue %></small>
+                  <% } %>
+                  <% if (gallery.eventDate) { %>
+                    <small class="text-muted"><i class="fas fa-calendar me-1"></i><%= new Date(gallery.eventDate).toLocaleDateString('en-IN') %></small>
+                  <% } %>
+                </div>
+              </div>
+              <% if (gallery.images && gallery.images.length > 1) { %>
+                <div class="card-footer bg-transparent border-0 px-4 pb-4">
+                  <div class="d-flex gap-1">
+                    <% gallery.images.slice(1, 5).forEach(img => { %>
+                      <img src="<%= img.url %>" alt="Gallery" class="rounded" style="width:50px;height:50px;object-fit:cover;"
+                           onerror="this.src='/images/default-event.jpg'">
+                    <% }) %>
+                    <% if (gallery.images.length > 5) { %>
+                      <div class="rounded d-flex align-items-center justify-content-center" 
+                           style="width:50px;height:50px;background:#f0f0f0;">
+                        <small class="text-muted fw-bold">+<%= gallery.images.length - 5 %></small>
+                      </div>
+                    <% } %>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+              </div>
+            </a>
+          </div>
+        <% }) %>
+      </div>
+
+      <% if (pagination.totalPages > 1) { %>
+        <nav class="mt-5">
+          <ul class="pagination justify-content-center">
+            <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+              <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                <a class="page-link rounded-pill" href="/events/gallery?page=<%= i %>&category=<%= currentCategory %>"><%= i %></a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      <% } %>
+    <% } %>
+  </div>
+</section>
+
+<style>
+.gallery-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.gallery-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.gallery-card h5 {
+  color: #333;
+  transition: color 0.3s ease;
+}
+.gallery-card:hover h5 {
+  color: #0d6efd;
+}
+</style>

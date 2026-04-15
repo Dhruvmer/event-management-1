@@ -1,0 +1,107 @@
+<div class="admin-topbar">
+  <h4 class="fw-bold mb-0"><i class="fas fa-user-plus me-2"></i>Add New User</h4>
+  <a href="/admin/users" class="btn btn-outline-secondary rounded-pill">
+    <i class="fas fa-arrow-left me-2"></i>Back to Users
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-4">
+    <form action="/admin/users/add" method="POST" enctype="multipart/form-data" novalidate>
+      <div class="row g-3">
+        <!-- Personal Information -->
+        <div class="col-12">
+          <h5 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i>Personal Information</h5>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">First Name *</label>
+          <input type="text" name="firstName" class="form-control" required>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Last Name *</label>
+          <input type="text" name="lastName" class="form-control" required>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Email Address *</label>
+          <input type="email" name="email" class="form-control" required>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Phone Number *</label>
+          <input type="tel" name="phone" class="form-control" required>
+        </div>
+        
+        <div class="col-12">
+          <label class="form-label fw-500">Profile Image</label>
+          <input type="file" name="profileImage" class="form-control" accept="image/*">
+          <small class="text-muted">Optional: Upload a profile picture (JPG, PNG, WebP)</small>
+        </div>
+        
+        <!-- Address Information -->
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Address Information</h5>
+        </div>
+        
+        <div class="col-md-4">
+          <label class="form-label fw-500">City</label>
+          <input type="text" name="city" class="form-control">
+        </div>
+        
+        <div class="col-md-4">
+          <label class="form-label fw-500">State</label>
+          <input type="text" name="state" class="form-control">
+        </div>
+        
+        <div class="col-md-4">
+          <label class="form-label fw-500">Country</label>
+          <input type="text" name="country" class="form-control">
+        </div>
+        
+        <!-- Account Information -->
+        <div class="col-12 mt-4">
+          <h5 class="fw-bold mb-3"><i class="fas fa-lock text-primary me-2"></i>Account Information</h5>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Password *</label>
+          <input type="password" name="password" class="form-control" required minlength="6">
+          <small class="text-muted">Minimum 6 characters</small>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-500">Confirm Password *</label>
+          <input type="password" name="confirmPassword" class="form-control" required minlength="6">
+          <small class="text-muted">Must match password</small>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="col-12 mt-4">
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill" onclick="return confirm('Are you sure you want to create this user?')">
+              <i class="fas fa-save me-2"></i>Create User
+            </button>
+            <a href="/admin/users" class="btn btn-outline-secondary btn-lg rounded-pill">
+              <i class="fas fa-times me-2"></i>Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+  const password = document.querySelector('input[name="password"]').value;
+  const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+  
+  if (password !== confirmPassword) {
+    e.preventDefault();
+    alert('Passwords do not match!');
+    return false;
+  }
+});
+</script>

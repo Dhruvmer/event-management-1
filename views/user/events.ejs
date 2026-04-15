@@ -1,0 +1,115 @@
+<section style="margin-top:80px;min-height:100vh;">
+  <!-- Page Header -->
+  <div class="page-header py-5 text-white text-center" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);">
+    <div class="container">
+      <h1 class="display-4 fw-bold">Our <span class="gradient-text">Events</span></h1>
+      <p class="lead opacity-75">Discover the perfect event service for your special occasion</p>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <!-- Filters -->
+    <div class="row mb-4">
+      <div class="col-lg-8">
+        <div class="d-flex flex-wrap gap-2">
+          <a href="/events" class="btn btn-sm rounded-pill <%= currentCategory === 'all' ? 'btn-primary' : 'btn-outline-primary' %>">All Events</a>
+          <% categories.forEach(cat => { %>
+            <a href="/events?category=<%= cat %>" class="btn btn-sm rounded-pill <%= currentCategory === cat ? 'btn-primary' : 'btn-outline-primary' %>">
+              <%= getCategoryName(cat) %>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+      <div class="col-lg-4 mt-3 mt-lg-0">
+        <form action="/events" method="GET" class="d-flex gap-2">
+          <input type="text" name="search" class="form-control rounded-pill" placeholder="Search events..." value="<%= searchQuery %>">
+          <button type="submit" class="btn btn-primary rounded-pill px-3"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sort -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <p class="text-muted mb-0">Showing <strong><%= events.length %></strong> of <strong><%= pagination.total %></strong> events</p>
+      <div class="d-flex gap-2 align-items-center">
+        <small class="text-muted">Sort by:</small>
+        <select class="form-select form-select-sm rounded-pill" style="width:auto;" onchange="window.location.href='/events?category=<%= currentCategory %>&sort='+this.value">
+          <option value="newest" <%= currentSort === 'newest' ? 'selected' : '' %>>Newest</option>
+          <option value="price-low" <%= currentSort === 'price-low' ? 'selected' : '' %>>Price: Low to High</option>
+          <option value="price-high" <%= currentSort === 'price-high' ? 'selected' : '' %>>Price: High to Low</option>
+          <option value="popular" <%= currentSort === 'popular' ? 'selected' : '' %>>Most Popular</option>
+          <option value="rating" <%= currentSort === 'rating' ? 'selected' : '' %>>Highest Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Events Grid -->
+    <% if (events.length === 0) { %>
+      <div class="text-center py-5">
+        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">No events found</h4>
+        <p class="text-muted">Try changing your filters or search terms</p>
+        <a href="/events" class="btn btn-primary rounded-pill">View All Events</a>
+      </div>
+    <% } else { %>
+      <div class="row g-4">
+        <% events.forEach(event => { %>
+          <div class="col-lg-4 col-md-6">
+            <div class="event-card card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+              <div class="position-relative">
+                <img src="<%= event.eventImage %>" class="card-img-top" alt="<%= event.title %>" 
+                     style="height:220px;object-fit:cover;" onerror="this.src='/images/default-event.jpg'">
+                <div class="event-category-badge"><%= getCategoryName(event.category) %></div>
+                <% if (event.isFeatured) { %>
+                  <div class="featured-badge"><i class="fas fa-star"></i> Featured</div>
+                <% } %>
+              </div>
+              <div class="card-body p-4">
+                <h5 class="card-title fw-bold"><%= event.title %></h5>
+                <p class="card-text text-muted small"><%= event.shortDescription || event.description.substring(0, 100) + '...' %></p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="text-primary fw-bold fs-5">₹<%= event.pricing.basePrice.toLocaleString('en-IN') %></span>
+                    <small class="text-muted"> onwards</small>
+                  </div>
+                  <span class="badge bg-success bg-opacity-10 text-success"><i class="fas fa-users me-1"></i><%= event.totalBookings %> booked</span>
+                </div>
+              </div>
+              <div class="card-footer bg-transparent border-0 p-4 pt-0 d-flex gap-2">
+                <a href="/events/<%= event.slug %>" class="btn btn-outline-primary btn-sm flex-grow-1 rounded-pill">
+                  <i class="fas fa-info-circle me-1"></i>Details
+                </a>
+                <a href="/bookings/book/<%= event.slug %>" class="btn btn-primary btn-sm flex-grow-1 rounded-pill">
+                  <i class="fas fa-ticket-alt me-1"></i>Book Now
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- Pagination -->
+      <% if (pagination.totalPages > 1) { %>
+        <nav class="mt-5">
+          <ul class="pagination justify-content-center">
+            <li class="page-item <%= !pagination.hasPrev ? 'disabled' : '' %>">
+              <a class="page-link rounded-pill" href="/events?page=<%= pagination.currentPage - 1 %>&category=<%= currentCategory %>">
+                <i class="fas fa-chevron-left"></i>
+              </a>
+            </li>
+            <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+              <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                <a class="page-link rounded-pill" href="/events?page=<%= i %>&category=<%= currentCategory %>"><%= i %></a>
+              </li>
+            <% } %>
+            <li class="page-item <%= !pagination.hasNext ? 'disabled' : '' %>">
+              <a class="page-link rounded-pill" href="/events?page=<%= pagination.currentPage + 1 %>&category=<%= currentCategory %>">
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      <% } %>
+    <% } %>
+  </div>
+</section>
