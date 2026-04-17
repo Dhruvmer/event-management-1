@@ -30,7 +30,6 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const imageRoutes = require('./routes/imageRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
-const cloudinaryUploadRoutes = require('./routes/cloudinaryUploadRoutes');
 
 // Import Middleware
 const { errorHandler, notFound } = require('./middleware/errorHandler');
@@ -197,7 +196,6 @@ app.use('/admin', adminRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/api', apiRoutes);
 app.use('/api', uploadRoutes);
-app.use('/api', cloudinaryUploadRoutes);
 app.use('/uploads/profiles', imageRoutes);
 app.use('/uploads/events', imageRoutes);
 app.use('/uploads/gallery', imageRoutes);
