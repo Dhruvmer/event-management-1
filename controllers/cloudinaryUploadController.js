@@ -1,9 +1,21 @@
 const multer = require('multer');
 const { cloudinary, getStorage } = require('../config/cloudinary');
+const { getCloudinaryStatus, isCloudinaryConfigured } = require('../config/cloudinarySetup');
 
 // Cloudinary File Upload API
 exports.uploadFiles = async (req, res) => {
   try {
+    // Check if Cloudinary is configured
+    if (!isCloudinaryConfigured()) {
+      const status = getCloudinaryStatus();
+      return res.status(400).json({
+        success: false,
+        message: 'Cloudinary is not configured',
+        error: status.message,
+        setupInstructions: status.setupInstructions
+      });
+    }
+
     const { category = 'misc' } = req.body;
     
     // Get appropriate storage based on category
@@ -37,9 +49,21 @@ exports.uploadFiles = async (req, res) => {
     uploadConfig(req, res, (err) => {
       if (err) {
         console.error('Cloudinary upload error:', err);
+        let errorMessage = err.message || 'File upload failed';
+        
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          errorMessage = 'File size too large';
+        } else if (err.code === 'LIMIT_FILE_COUNT') {
+          errorMessage = 'Too many files';
+        } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+          errorMessage = 'Unexpected field name';
+        } else if (err.message && err.message.includes('file format not allowed')) {
+          errorMessage = 'File format not allowed. Please use jpg, jpeg, png, webp, or gif';
+        }
+        
         return res.status(400).json({
           success: false,
-          message: err.message || 'File upload failed',
+          message: errorMessage,
           error: err
         });
       }
@@ -110,6 +134,17 @@ exports.uploadFiles = async (req, res) => {
 // Single file upload (for quick uploads)
 exports.uploadSingle = async (req, res) => {
   try {
+    // Check if Cloudinary is configured
+    if (!isCloudinaryConfigured()) {
+      const status = getCloudinaryStatus();
+      return res.status(400).json({
+        success: false,
+        message: 'Cloudinary is not configured',
+        error: status.message,
+        setupInstructions: status.setupInstructions
+      });
+    }
+
     const { category = 'misc', fieldName = 'file' } = req.body;
     
     const storage = getStorage(category);
@@ -117,9 +152,23 @@ exports.uploadSingle = async (req, res) => {
     
     upload(req, res, (err) => {
       if (err) {
+        console.error('Cloudinary single upload error:', err);
+        let errorMessage = err.message || 'File upload failed';
+        
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          errorMessage = 'File size too large';
+        } else if (err.code === 'LIMIT_FILE_COUNT') {
+          errorMessage = 'Too many files';
+        } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+          errorMessage = 'Unexpected field name';
+        } else if (err.message && err.message.includes('file format not allowed')) {
+          errorMessage = 'File format not allowed. Please use jpg, jpeg, png, webp, or gif';
+        }
+        
         return res.status(400).json({
           success: false,
-          message: err.message || 'File upload failed'
+          message: errorMessage,
+          error: err
         });
       }
 

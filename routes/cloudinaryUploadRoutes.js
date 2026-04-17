@@ -1,10 +1,31 @@
 const express = require('express');
 const router = express.Router();
 const cloudinaryUploadController = require('../controllers/cloudinaryUploadController');
+const { getCloudinaryStatus, testCloudinaryConnection } = require('../config/cloudinarySetup');
 const { isAdmin } = require('../middleware/adminAuth');
 const { isAuthenticated } = require('../middleware/auth');
 
 // Cloudinary upload endpoints
+
+// GET /api/cloudinary/status - Check Cloudinary configuration status
+router.get('/cloudinary/status', async (req, res) => {
+  try {
+    const status = getCloudinaryStatus();
+    const connectionTest = await testCloudinaryConnection();
+    
+    res.json({
+      success: true,
+      status: status,
+      connection: connectionTest
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error checking Cloudinary status',
+      error: error.message
+    });
+  }
+});
 
 // POST /api/cloudinary/upload - General file upload (requires authentication)
 router.post('/cloudinary/upload', isAuthenticated, cloudinaryUploadController.uploadFiles);
