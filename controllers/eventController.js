@@ -1,7 +1,7 @@
 const Event = require('../models/Event');
 const Gallery = require('../models/Gallery');
 const Booking = require('../models/Booking');
-const { getPagination, getCategoryName } = require('../utils/helpers');
+const { getPagination, getCategoryName, getCategoryIcon } = require('../utils/helpers');
 
 // GET - Landing Page / Home
 exports.getLandingPage = async (req, res) => {
@@ -163,6 +163,7 @@ exports.getGallery = async (req, res) => {
       pagination,
       currentCategory: category || 'all',
       getCategoryName,
+      getCategoryIcon,
       layout: 'layouts/main'
     });
   } catch (error) {

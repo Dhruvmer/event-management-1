@@ -103,6 +103,26 @@ const getCategoryName = (category) => {
   return categoryNames[category] || category;
 };
 
+// Category icons (separate from names for flexibility)
+const categoryIcons = {
+  'wedding': 'fas fa-heart',
+  'birthday': 'fas fa-birthday-cake',
+  'corporate': 'fas fa-briefcase',
+  'concert': 'fas fa-music',
+  'conference': 'fas fa-microphone',
+  'anniversary': 'fas fa-ring',
+  'baby-shower': 'fas fa-baby',
+  'engagement': 'fas fa-gem',
+  'graduation': 'fas fa-graduation-cap',
+  'festival': 'fas fa-star',
+  'charity': 'fas fa-hand-holding-heart',
+  'other': 'fas fa-calendar'
+};
+
+const getCategoryIcon = (category) => {
+  return categoryIcons[category] || 'fas fa-calendar';
+};
+
 module.exports = {
   generateToken,
   formatCurrency,
@@ -112,5 +132,6 @@ module.exports = {
   getPagination,
   slugify,
   categoryNames,
-  getCategoryName
+  getCategoryName,
+  getCategoryIcon
 };
