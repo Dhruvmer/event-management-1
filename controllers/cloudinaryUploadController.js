@@ -5,8 +5,14 @@ const { getCloudinaryStatus, isCloudinaryConfigured } = require('../config/cloud
 // Cloudinary File Upload API
 exports.uploadFiles = async (req, res) => {
   try {
+    console.log('☁️ Cloudinary Upload Request - Category:', req.body.category || 'misc');
+    console.log('☁️ Request body:', req.body);
+    console.log('☁️ Request files:', req.files);
+    console.log('☁️ Request file:', req.file);
+    
     // Check if Cloudinary is configured
     if (!isCloudinaryConfigured()) {
+      console.log('❌ Cloudinary not configured');
       const status = getCloudinaryStatus();
       return res.status(400).json({
         success: false,
@@ -15,40 +21,50 @@ exports.uploadFiles = async (req, res) => {
         setupInstructions: status.setupInstructions
       });
     }
+    
+    console.log('✅ Cloudinary is configured and ready');
 
     const { category = 'misc' } = req.body;
     
     // Get appropriate storage based on category
+    console.log('☁️ Getting Cloudinary storage for category:', category);
     const storage = getStorage(category);
     const upload = multer({ storage: storage });
     
     // Determine upload configuration based on category
     let uploadConfig;
     
+    console.log('☁️ Setting up upload configuration for:', category);
     switch (category) {
       case 'profile':
         uploadConfig = upload.single('profileImage');
+        console.log('☁️ Using profile upload config');
         break;
       case 'event':
         uploadConfig = upload.fields([
           { name: 'eventImage', maxCount: 1 },
           { name: 'eventImages', maxCount: 10 }
         ]);
+        console.log('☁️ Using event upload config');
         break;
       case 'gallery':
         uploadConfig = upload.array('galleryImages', 20);
+        console.log('☁️ Using gallery upload config');
         break;
       case 'booking':
         uploadConfig = upload.single('bookingDocument');
+        console.log('☁️ Using booking upload config');
         break;
       default:
         uploadConfig = upload.array('files', 10);
+        console.log('☁️ Using misc upload config');
     }
 
     // Handle the upload
+    console.log('☁️ Starting Cloudinary upload process...');
     uploadConfig(req, res, (err) => {
       if (err) {
-        console.error('Cloudinary upload error:', err);
+        console.error('❌ Cloudinary upload error:', err);
         let errorMessage = err.message || 'File upload failed';
         
         if (err.code === 'LIMIT_FILE_SIZE') {
@@ -68,26 +84,50 @@ exports.uploadFiles = async (req, res) => {
         });
       }
 
+      console.log('✅ Cloudinary upload completed successfully');
+      console.log('☁️ Files after Cloudinary upload:', req.files);
+      console.log('☁️ Single file after Cloudinary upload:', req.file);
+      
       // Process uploaded files and return URLs
       let uploadedFiles = [];
       
       if (req.files) {
+        console.log('☁️ Processing multiple files from Cloudinary...');
         if (Array.isArray(req.files)) {
           // Multiple files array
-          uploadedFiles = req.files.map(file => ({
-            filename: file.filename,
-            originalName: file.originalname,
-            size: file.size,
-            mimetype: file.mimetype,
-            url: file.path, // Cloudinary URL
-            publicId: file.filename // Cloudinary public_id
-          }));
+          console.log('☁️ Processing array of files from Cloudinary:', req.files.length, 'files');
+          uploadedFiles = req.files.map((file, index) => {
+            console.log(`☁️ Cloudinary File ${index + 1}:`, {
+              filename: file.filename,
+              originalName: file.originalname,
+              size: file.size,
+              mimetype: file.mimetype,
+              url: file.path,
+              publicId: file.filename
+            });
+            return {
+              filename: file.filename,
+              originalName: file.originalname,
+              size: file.size,
+              mimetype: file.mimetype,
+              url: file.path, // Cloudinary URL
+              publicId: file.filename // Cloudinary public_id
+            };
+          });
         } else if (typeof req.files === 'object') {
           // Multiple fields (like event images)
+          console.log('☁️ Processing object with multiple fields from Cloudinary:', Object.keys(req.files));
           Object.keys(req.files).forEach(fieldName => {
             const files = req.files[fieldName];
+            console.log(`☁️ Cloudinary Field '${fieldName}' has ${files.length} files`);
             if (Array.isArray(files)) {
-              files.forEach(file => {
+              files.forEach((file, index) => {
+                console.log(`☁️ Cloudinary ${fieldName} file ${index + 1}:`, {
+                  filename: file.filename,
+                  originalName: file.originalname,
+                  size: file.size,
+                  url: file.path
+                });
                 uploadedFiles.push({
                   filename: file.filename,
                   originalName: file.originalname,
@@ -103,6 +143,13 @@ exports.uploadFiles = async (req, res) => {
         }
       } else if (req.file) {
         // Single file
+        console.log('☁️ Processing single file from Cloudinary:', {
+          filename: req.file.filename,
+          originalName: req.file.originalname,
+          size: req.file.size,
+          mimetype: req.file.mimetype,
+          url: req.file.path
+        });
         uploadedFiles = [{
           filename: req.file.filename,
           originalName: req.file.originalname,
@@ -111,8 +158,18 @@ exports.uploadFiles = async (req, res) => {
           url: req.file.path, // Cloudinary URL
           publicId: req.file.filename // Cloudinary public_id
         }];
+      } else {
+        console.log('⚠️ No files found in Cloudinary request');
       }
 
+      console.log('☁️ Sending Cloudinary response with', uploadedFiles.length, 'files');
+      console.log('☁️ Cloudinary Response data:', {
+        success: true,
+        message: 'Files uploaded successfully to Cloudinary',
+        category,
+        count: uploadedFiles.length
+      });
+      
       res.json({
         success: true,
         message: 'Files uploaded successfully to Cloudinary',
@@ -134,8 +191,13 @@ exports.uploadFiles = async (req, res) => {
 // Single file upload (for quick uploads)
 exports.uploadSingle = async (req, res) => {
   try {
+    console.log('☁️ Cloudinary Single Upload Request - Category:', req.body.category || 'misc');
+    console.log('☁️ Field Name:', req.body.fieldName || 'file');
+    console.log('☁️ Request body:', req.body);
+    
     // Check if Cloudinary is configured
     if (!isCloudinaryConfigured()) {
+      console.log('❌ Cloudinary not configured for single upload');
       const status = getCloudinaryStatus();
       return res.status(400).json({
         success: false,
@@ -144,15 +206,19 @@ exports.uploadSingle = async (req, res) => {
         setupInstructions: status.setupInstructions
       });
     }
+    
+    console.log('✅ Cloudinary configured for single upload');
 
     const { category = 'misc', fieldName = 'file' } = req.body;
     
+    console.log('☁️ Getting Cloudinary storage for single upload category:', category);
     const storage = getStorage(category);
     const upload = multer({ storage: storage }).single(fieldName);
     
+    console.log('☁️ Starting Cloudinary single file upload process...');
     upload(req, res, (err) => {
       if (err) {
-        console.error('Cloudinary single upload error:', err);
+        console.error('❌ Cloudinary single upload error:', err);
         let errorMessage = err.message || 'File upload failed';
         
         if (err.code === 'LIMIT_FILE_SIZE') {
@@ -173,12 +239,23 @@ exports.uploadSingle = async (req, res) => {
       }
 
       if (!req.file) {
+        console.log('❌ No file found in Cloudinary single upload request');
         return res.status(400).json({
           success: false,
           message: 'No file uploaded'
         });
       }
+      
+      console.log('✅ Single file uploaded successfully to Cloudinary:', {
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+        url: req.file.path,
+        publicId: req.file.filename
+      });
 
+      console.log('☁️ Sending Cloudinary single upload response');
       res.json({
         success: true,
         message: 'File uploaded successfully to Cloudinary',

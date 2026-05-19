@@ -1,9 +1,11 @@
 const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
+const { getStorage } = require('./cloudinary');
+const { isCloudinaryConfigured } = require('./cloudinarySetup');
 
 // Storage Configuration
-const storage = multer.diskStorage({
+const localDiskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadPath = 'public/uploads/';
     if (file.fieldname === 'profileImage') {
@@ -26,6 +28,10 @@ const storage = multer.diskStorage({
   }
 });
 
+const getDynamicStorage = (category) => {
+  return isCloudinaryConfigured() ? getStorage(category) : localDiskStorage;
+};
+
 // File Filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = (process.env.ALLOWED_FILE_TYPES || 'image/jpeg,image/png,image/webp,application/pdf').split(',');
@@ -37,27 +43,30 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Multer Configuration
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024, // 5MB default
-    files: 10
-  }
-});
+const getUpload = (category) => {
+  return multer({
+    storage: getDynamicStorage(category),
+    fileFilter: fileFilter,
+    limits: {
+      fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024, // 5MB default
+      files: 10
+    }
+  });
+};
+
+const upload = getUpload('misc');
 
 // Export different upload configurations
 module.exports = {
-  single: (fieldName) => upload.single(fieldName),
-  multiple: (fieldName, maxCount) => upload.array(fieldName, maxCount || 5),
-  fields: (fieldsArray) => upload.fields(fieldsArray),
-  profileUpload: upload.single('profileImage'),
-  eventUpload: upload.fields([
+  single: (fieldName) => getUpload('misc').single(fieldName),
+  multiple: (fieldName, maxCount) => getUpload('misc').array(fieldName, maxCount || 5),
+  fields: (fieldsArray) => getUpload('misc').fields(fieldsArray),
+  profileUpload: getUpload('profile').single('profileImage'),
+  eventUpload: getUpload('event').fields([
     { name: 'eventImage', maxCount: 1 },
     { name: 'eventImages', maxCount: 10 }
   ]),
-  galleryUpload: upload.array('galleryImages', 20),
-  bookingUpload: upload.single('bookingDocument'),
+  galleryUpload: getUpload('gallery').array('galleryImages', 20),
+  bookingUpload: getUpload('booking').single('bookingDocument'),
   upload
 };

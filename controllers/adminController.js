@@ -8,6 +8,7 @@ const { getPagination, getCategoryName, parseUserAgent, generateToken } = requir
 // ============ DASHBOARD ============
 exports.getDashboard = async (req, res) => {
   try {
+    console.log('👑 Admin Dashboard Request - User:', req.session.user?.email);
     const [
       totalUsers,
       totalEvents,
@@ -46,6 +47,15 @@ exports.getDashboard = async (req, res) => {
     const statusMap = {};
     bookingsByStatus.forEach(s => { statusMap[s._id] = s.count; });
 
+    console.log('📊 Dashboard Data Loaded:', {
+      totalUsers,
+      totalEvents,
+      totalBookings,
+      totalRevenue: totalRevenue[0]?.total || 0,
+      recentBookingsCount: recentBookings.length,
+      recentUsersCount: recentUsers.length
+    });
+    
     res.render('admin/dashboard', {
       title: 'Admin Dashboard - EventPro',
       totalUsers,
@@ -74,6 +84,7 @@ exports.getDashboard = async (req, res) => {
 
 // ============ ADMIN LOGIN ============
 exports.getAdminLogin = (req, res) => {
+  console.log('🔑 Admin Login Page Accessed');
   res.render('admin/login', {
     title: 'Admin Login - EventPro',
     layout: 'layouts/admin-login'
@@ -82,13 +93,19 @@ exports.getAdminLogin = (req, res) => {
 
 exports.postAdminLogin = async (req, res) => {
   try {
+    console.log('🔑 Admin Login Attempt - Email:', req.body.email);
     const { email, password } = req.body;
     const user = await User.findOne({ email: email.toLowerCase(), role: 'admin' });
+    
+    console.log('🔍 Admin User Found:', !!user);
 
     if (!user || !(await user.comparePassword(password))) {
+      console.log('❌ Admin Login Failed - Invalid credentials for:', email);
       req.flash('error', 'Invalid admin credentials');
       return res.redirect('/admin/login');
     }
+    
+    console.log('✅ Admin Login Successful:', email);
 
     user.lastLogin = new Date();
     user.loginCount += 1;
@@ -119,6 +136,7 @@ exports.postAdminLogin = async (req, res) => {
     });
 
     req.flash('success', 'Welcome Admin!');
+    console.log('🎯 Redirecting to admin dashboard');
     res.redirect('/admin/dashboard');
   } catch (error) {
     req.flash('error', 'Login failed');
@@ -129,6 +147,7 @@ exports.postAdminLogin = async (req, res) => {
 // ============ USERS MANAGEMENT ============
 exports.getUsers = async (req, res) => {
   try {
+    console.log('👥 Admin Users Management - Query:', req.query);
     const { search, page = 1, status } = req.query;
     const filter = { role: 'user' };
 
@@ -152,6 +171,14 @@ exports.getUsers = async (req, res) => {
       .skip(pagination.skip)
       .limit(pagination.perPage);
 
+    console.log('👥 Users Loaded:', {
+      count: users.length,
+      total,
+      currentPage: page,
+      search,
+      status
+    });
+    
     res.render('admin/users', {
       title: 'User Management - EventPro',
       users,
@@ -169,12 +196,23 @@ exports.getUsers = async (req, res) => {
 // Toggle User Status
 exports.toggleUserStatus = async (req, res) => {
   try {
+    console.log('🔄 Toggle User Status - User ID:', req.params.id);
     const user = await User.findById(req.params.id);
     if (!user) {
+      console.log('❌ User not found for status toggle:', req.params.id);
       return res.status(404).json({ success: false, message: 'User not found' });
     }
+    const previousStatus = user.isActive;
     user.isActive = !user.isActive;
     await user.save();
+    
+    console.log('✅ User Status Toggled:', {
+      userId: user._id,
+      email: user.email,
+      previousStatus,
+      newStatus: user.isActive
+    });
+    
     req.flash('success', `User ${user.isActive ? 'activated' : 'deactivated'} successfully`);
     res.redirect('/admin/users');
   } catch (error) {
@@ -216,6 +254,7 @@ exports.getSessions = async (req, res) => {
 // ============ BOOKINGS MANAGEMENT ============
 exports.getBookings = async (req, res) => {
   try {
+    console.log('📋 Admin Bookings Management - Query:', req.query);
     const { status, search, page = 1, payment } = req.query;
     const filter = {};
 
@@ -239,6 +278,15 @@ exports.getBookings = async (req, res) => {
       .skip(pagination.skip)
       .limit(pagination.perPage);
 
+    console.log('📋 Bookings Loaded:', {
+      count: bookings.length,
+      total,
+      currentPage: page,
+      status,
+      payment,
+      search
+    });
+    
     res.render('admin/bookings', {
       title: 'Booking Management - EventPro',
       bookings,
@@ -258,8 +306,11 @@ exports.getBookings = async (req, res) => {
 // Update Booking Status
 exports.updateBookingStatus = async (req, res) => {
   try {
+    console.log('🔄 Update Booking Status - ID:', req.params.id, 'New Status:', req.body.status);
     const { status, adminNotes } = req.body;
     const booking = await Booking.findById(req.params.id);
+    
+    console.log('🔍 Booking Found:', !!booking, 'Booking ID:', booking?.bookingId);
 
     if (!booking) {
       req.flash('error', 'Booking not found');
@@ -391,10 +442,11 @@ exports.postAddEvent = async (req, res) => {
     // Handle images
     if (req.files) {
       if (req.files.eventImage && req.files.eventImage[0]) {
-        eventData.eventImage = '/uploads/events/' + req.files.eventImage[0].filename;
+        const file = req.files.eventImage[0];
+        eventData.eventImage = file.path && file.path.startsWith('http') ? file.path : '/uploads/events/' + file.filename;
       }
       if (req.files.eventImages) {
-        eventData.eventImages = req.files.eventImages.map(f => '/uploads/events/' + f.filename);
+        eventData.eventImages = req.files.eventImages.map(f => f.path && f.path.startsWith('http') ? f.path : '/uploads/events/' + f.filename);
       }
     }
 
@@ -430,6 +482,14 @@ exports.getEditEvent = async (req, res) => {
 // POST - Update Event
 exports.postEditEvent = async (req, res) => {
   try {
+    console.log('📝 Admin Edit Event - Event ID:', req.params.id);
+    console.log('📝 Event Update Data:', {
+      title: req.body.title,
+      category: req.body.category,
+      basePrice: req.body.basePrice,
+      isActive: req.body.isActive
+    });
+    
     const updateData = {
       title: req.body.title,
       category: req.body.category,
@@ -454,10 +514,11 @@ exports.postEditEvent = async (req, res) => {
     };
 
     if (req.files?.eventImage?.[0]) {
-      updateData.eventImage = '/uploads/events/' + req.files.eventImage[0].filename;
+      const file = req.files.eventImage[0];
+      updateData.eventImage = file.path && file.path.startsWith('http') ? file.path : '/uploads/events/' + file.filename;
     }
     if (req.files?.eventImages) {
-      updateData.eventImages = req.files.eventImages.map(f => '/uploads/events/' + f.filename);
+      updateData.eventImages = req.files.eventImages.map(f => f.path && f.path.startsWith('http') ? f.path : '/uploads/events/' + f.filename);
     }
 
     await Event.findByIdAndUpdate(req.params.id, updateData, { runValidators: true });
@@ -524,7 +585,7 @@ exports.postAddGallery = async (req, res) => {
 
     if (req.files) {
       galleryData.images = req.files.map((file, index) => ({
-        url: '/uploads/gallery/' + file.filename,
+        url: file.path && file.path.startsWith('http') ? file.path : '/uploads/gallery/' + file.filename,
         caption: '',
         order: index
       }));
@@ -579,7 +640,7 @@ exports.postAddUser = async (req, res) => {
     // Handle profile image
     let profileImage = '/images/default-avatar.png';
     if (req.file) {
-      profileImage = `/uploads/profiles/${req.file.filename}`;
+      profileImage = req.file.path && req.file.path.startsWith('http') ? req.file.path : `/uploads/profiles/${req.file.filename}`;
     }
     
     // Hash password manually before creating user
@@ -659,7 +720,7 @@ exports.postEditUser = async (req, res) => {
     
     // Handle profile image
     if (req.file) {
-      updateData.profileImage = `/uploads/profiles/${req.file.filename}`;
+      updateData.profileImage = req.file.path && req.file.path.startsWith('http') ? req.file.path : `/uploads/profiles/${req.file.filename}`;
     }
     
     // Only update password if provided - hash it manually
@@ -727,7 +788,7 @@ exports.postEditGallery = async (req, res) => {
     // Handle images
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map(file => ({
-        url: `/uploads/gallery/${file.filename}`,
+        url: file.path && file.path.startsWith('http') ? file.path : `/uploads/gallery/${file.filename}`,
         caption: file.originalname
       }));
       

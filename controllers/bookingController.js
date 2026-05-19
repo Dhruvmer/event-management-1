@@ -84,7 +84,7 @@ exports.createBooking = async (req, res) => {
     if (req.file) {
       documents.push({
         name: req.file.originalname,
-        path: '/uploads/bookings/' + req.file.filename
+        path: req.file.path && req.file.path.startsWith('http') ? req.file.path : '/uploads/bookings/' + req.file.filename
       });
     }
 

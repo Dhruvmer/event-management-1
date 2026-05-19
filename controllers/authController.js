@@ -26,7 +26,7 @@ exports.postRegister = async (req, res) => {
     // Handle profile image
     let profileImage = '/images/default-avatar.png';
     if (req.file) {
-      profileImage = '/uploads/profiles/' + req.file.filename;
+      profileImage = req.file.path && req.file.path.startsWith('http') ? req.file.path : '/uploads/profiles/' + req.file.filename;
     }
 
     // Create user
@@ -189,7 +189,7 @@ exports.updateProfile = async (req, res) => {
     };
 
     if (req.file) {
-      updateData.profileImage = '/uploads/profiles/' + req.file.filename;
+      updateData.profileImage = req.file.path && req.file.path.startsWith('http') ? req.file.path : '/uploads/profiles/' + req.file.filename;
     }
 
     const user = await User.findByIdAndUpdate(req.session.user._id, updateData, { new: true, runValidators: true });
